@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>HELLWORLD | 机器学习从入门到放弃</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="写这个的起因就是，发现waifu2x这个程序只能N卡用，这么好的东西怎么能让N卡用户独占呢，我们A卡用户就只能苦逼地用CPU算到天荒地老了吗。 所以就写一个从0开始的机器学习吧。第一步，学习CUDA，铺好路了就学习cuDNN，此乃第二步，知己知彼百战不殆，别人的源码都不能读懂，那不战而败啊。最后一步就是逐渐的翻译成opencl实现的waifu2x。 PS:如果有能力+有贵人相助的话，能写一个基于o">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HELLWORLD">
+<meta property="og:url" content="http://yoursite.com/2017/12/26/helloworld/index.html">
+<meta property="og:site_name" content="机器学习从入门到放弃">
+<meta property="og:description" content="写这个的起因就是，发现waifu2x这个程序只能N卡用，这么好的东西怎么能让N卡用户独占呢，我们A卡用户就只能苦逼地用CPU算到天荒地老了吗。 所以就写一个从0开始的机器学习吧。第一步，学习CUDA，铺好路了就学习cuDNN，此乃第二步，知己知彼百战不殆，别人的源码都不能读懂，那不战而败啊。最后一步就是逐渐的翻译成opencl实现的waifu2x。 PS:如果有能力+有贵人相助的话，能写一个基于o">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:updated_time" content="2018-03-08T09:15:48.867Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HELLWORLD">
+<meta name="twitter:description" content="写这个的起因就是，发现waifu2x这个程序只能N卡用，这么好的东西怎么能让N卡用户独占呢，我们A卡用户就只能苦逼地用CPU算到天荒地老了吗。 所以就写一个从0开始的机器学习吧。第一步，学习CUDA，铺好路了就学习cuDNN，此乃第二步，知己知彼百战不殆，别人的源码都不能读懂，那不战而败啊。最后一步就是逐渐的翻译成opencl实现的waifu2x。 PS:如果有能力+有贵人相助的话，能写一个基于o">
+  
+    <link rel="alternate" href="/atom.xml" title="机器学习从入门到放弃" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">机器学习从入门到放弃</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">从CUDA到cuDNN到进入疯人院</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-helloworld" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/26/helloworld/" class="article-date">
+  <time datetime="2017-12-25T16:00:00.000Z" itemprop="datePublished">2017-12-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      HELLWORLD
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>写这个的起因就是，发现waifu2x这个程序只能N卡用，这么好的东西怎么能让N卡用户独占呢，我们A卡用户就只能苦逼地用CPU算到天荒地老了吗。</p>
+<p>所以就写一个从0开始的机器学习吧。第一步，学习CUDA，铺好路了就学习cuDNN，此乃第二步，知己知彼百战不殆，别人的源码都不能读懂，那不战而败啊。最后一步就是逐渐的翻译成opencl实现的waifu2x。</p>
+<p>PS:如果有能力+有贵人相助的话，能写一个基于opencl的DNN库就好了。嗯……clDNN？</p>
+<p>PS2:标题没写错，闭源的cuDNN的世界，就是HELLWORLD</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/26/helloworld/" data-id="cjf14qoty000bxstmydh8fmv2" class="article-share-link">Teilen</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/12/26/0x02/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          0x02 第一个CUDA工程
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/03/18/0x11/">0x11 OPENCL编程指南前言</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/09/0x10/">数学笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/01/0x09/">0x09 CUDA内存管理</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/30/0x07/">0x07 延迟隐藏和GPU占用率</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/30/0x08/">0x08 CUDA内存模型</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 smtdbd<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

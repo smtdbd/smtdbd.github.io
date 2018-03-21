@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>0x11 OPENCL编程指南前言 | 机器学习从入门到放弃</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言During the past few years, heterogeneous computerscomposed of CPUs and GPUs have revolutionized computing. By matching different parts of a workload to the most suitable processor, tremendous perfor">
+<meta property="og:type" content="article">
+<meta property="og:title" content="0x11 OPENCL编程指南前言">
+<meta property="og:url" content="http://yoursite.com/2018/03/18/0x11/index.html">
+<meta property="og:site_name" content="机器学习从入门到放弃">
+<meta property="og:description" content="前言During the past few years, heterogeneous computerscomposed of CPUs and GPUs have revolutionized computing. By matching different parts of a workload to the most suitable processor, tremendous perfor">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:updated_time" content="2018-03-21T13:33:36.240Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="0x11 OPENCL编程指南前言">
+<meta name="twitter:description" content="前言During the past few years, heterogeneous computerscomposed of CPUs and GPUs have revolutionized computing. By matching different parts of a workload to the most suitable processor, tremendous perfor">
+  
+    <link rel="alternate" href="/atom.xml" title="机器学习从入门到放弃" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">机器学习从入门到放弃</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">从CUDA到cuDNN到进入疯人院</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-0x11" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/18/0x11/" class="article-date">
+  <time datetime="2018-03-17T16:00:00.000Z" itemprop="datePublished">2018-03-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      0x11 OPENCL编程指南前言
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>During the past few years, heterogeneous computerscomposed of CPUs and GPUs have revolutionized computing. By matching different parts of a workload to the most suitable processor, tremendous performance gains have been achieved.</p>
+<hr>
+<p>在过去几年里，各种各样的由CPU和GPU组成的计算机迎来了计算革命，通过把不同的工作分配给最适合的处理器，可以获得极高的性能。</p>
+<p>heterogeneous: 各种各样的、不同的</p>
+<p>tremendous: 巨大的，极大的，极强的</p>
+<hr>
+<p>Much of this revolution has been driven by the emergence of many-core processors such as GPUs. Forexample, it is now possible to buy a graphics card that can execute more than a trillion floating point operation per second(teraflops). These GPUs were designed to render beautiful images, but for the right workloads, they can also be used as high-performance computing engines for applications from scientific computing to augmented reality.</p>
+<hr>
+<p>这种革命大多是由多核处理器带来的，例如GPU。举个栗子，现在买一张显卡就能执行每秒超过一万亿次浮点指令。这些GPU本来设计用来渲染漂亮的图片，但是通过适当的调度，也可以用来执行高性能计算，上至科学计算，下至增强现实。</p>
+<hr>
+<p>A natural question is why these many-core processors are so fast compared to traditional single core CPUs. The fundamental driving force is innovative parallel hardware. Parallel computing is more efficient than sequential computing because chips are fundamentally parallel. Modern chips contain billions of transistors. Many-core processors organize these transistors into many parallel processors consisting of hundreds of floating point units. Another important reason for their speed advantage is new parallel software. Utilizing all these computing resources requires that we develop parallel programs. The efficiency gains due to software and hardware, allow us to get more FLOPs per Watt or per dollay than a single-core CPU.</p>
+<hr>
+<p>自然而然会想到，为什么这些多核处理器和传统单核处理器相比，会快上这么多呢？最基本的原因就是这是一种创新性的并行硬件。在并行处理器上并行计算比串行计算要高效的多。现代的芯片是由数十亿的晶体管组成的。而多喝处理器把这些晶体管组织成大量并行处理器，包含上百个浮点单元。另一个重要的原因就是全新的并行软件放大了这方面的优势。为了更好地利用这些计算资源，我们开发了并行编程。从硬件软件两方面得到的效率，比起单核处理器的能效比、或者是能费比要高得多。</p>
+<p>fundamental: 基础的，根本的。</p>
+<p>innovative: 革新的,创新的。</p>
+<p>transistors: 晶体(三级)管,晶体收音机。</p>
+<p>Utilizing：利用，运用。</p>
+<ul>
+<li>能效比：浮点数每秒每瓦特</li>
+<li>能费比：浮点数每秒每美元</li>
+</ul>
+<hr>
+<p>Computing systems are a symbiotic combination of hardware and software. Hardware is not useful without a good programming model. The success of CPUs has been tied to the success of their programming models, as exemplified by C language and its successor. C nicely abstracts a sequential computer. To fully exploit heterogeneous computers, we need new programming models that nicely abstract a modern <em>parallel</em> computer. And we can look to techniques established in graphics as a guide to the new programming models we need for heterogeneous computing.</p>
+<hr>
+<p>计算系统是由硬件和软件共同组合而成的。 硬件要是没有一个好的编程模型就没啥用。CPU的成功和它的编程模型的成功密切相关，就像C语言和它的继任者一样典型。C语言对顺序计算进行了很好的抽象化。为了完美地开发出不同计算机的能力，就必须为现代的并行计算机创建一个良好的抽象模型。我们可以把显卡里面使用的技术当作参考，来建立我们所需要的异构计算的模型。</p>
+<p>symbiotic: 共生的，共性的。</p>
+<p>exemplified： 是…的典范，典型</p>
+<p>exploit： 开发，利用，开采</p>
+<hr>
+<p>I have been interested in programming models for graphics for many years. It started in 1988 when I was a software engineer at PIXAR, where I developed the RenderMan shading language. A decade later graphics system became fast enough that we could consider developing shading languages for GPUs. With Kekoa Proudfoot and Bill Mark, we developed a real-time shading language, RTSL. RTSL ran on graphics hardware by compiling shading language programs into pixel shader programs, the assembly language for graphics hardware of the day. Bill Mark subsequently went to work at NVIDIA, where he developed Cg. More recently, I have been working with Tim Foley at Intel, who has developed a new shading language called Spark. Spark takes shading languages to the next level by abstracting complex graphics pipelines with new capabilities such as tesselation.</p>
+<hr>
+<p>我已经对显卡的计算模型感兴趣好多年了。最开始的时候是1988年，那时我还在皮克斯当一个软件工程师，在那我开发了一个叫RenderMan的着色器语言。十年之后，图形系统已经快到我们觉得可以为GPU开发一个着色器语言。当时伙同Kekoa Proudfoot、Bill Mark，我们开发了一个实时着色器语言，RTSL。RTSL利用着色器程序编译成为pixel shader程序，以便在显卡上工作。Bill Mark随后就前往英伟达就职，在那他开发了Cg工具包。最近，我和Tim Foley 在英特尔工作，他在开发过一个新的着色器语言叫做Spark。Spark通过抽象化复杂的图形管线，把着色器语言提升了一个层次，还添加了诸如曲面细分之类的新功能。</p>
+<p>decade：十年，年代</p>
+<p>More recently： 近来，最近。</p>
+<p>capabilities：能力，才能.</p>
+<p>tesselation： 曲面细分技术。</p>
+<hr>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/03/18/0x11/" data-id="cjf14qots0007xstm2ii70tz2" class="article-share-link">Teilen</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/03/09/0x10/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">数学笔记</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/03/18/0x11/">0x11 OPENCL编程指南前言</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/09/0x10/">数学笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/01/0x09/">0x09 CUDA内存管理</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/30/0x07/">0x07 延迟隐藏和GPU占用率</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/30/0x08/">0x08 CUDA内存模型</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 smtdbd<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>0x05 详解核函数 | 机器学习从入门到放弃</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="核函数定义核函数是C语言中对device的调用的入口，其定义如下1kernel_name &amp;lt;&amp;lt;&amp;lt;grid, block&amp;gt;&amp;gt;&amp;gt;(argument list) grid参数指定了本函数有多少个块。而block参数则定义了每个块中有多少个线程，也就是说这个函数会被执行grid * block次 编写核函数在编写一个核函数的时候，在原本的函数声明前面需要加上一个限定符，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="0x05 详解核函数">
+<meta property="og:url" content="http://yoursite.com/2017/12/28/0x05/index.html">
+<meta property="og:site_name" content="机器学习从入门到放弃">
+<meta property="og:description" content="核函数定义核函数是C语言中对device的调用的入口，其定义如下1kernel_name &amp;lt;&amp;lt;&amp;lt;grid, block&amp;gt;&amp;gt;&amp;gt;(argument list) grid参数指定了本函数有多少个块。而block参数则定义了每个块中有多少个线程，也就是说这个函数会被执行grid * block次 编写核函数在编写一个核函数的时候，在原本的函数声明前面需要加上一个限定符，">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://t1.aixinxi.net/o_1c2e4c4od19h015n3164o1dgm3roa.png-w.jpg">
+<meta property="og:image" content="http://t1.aixinxi.net/o_1c2e5a9m5pnb1h87kejhjk4c6a.png-w.jpg">
+<meta property="og:updated_time" content="2018-03-08T09:52:13.765Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="0x05 详解核函数">
+<meta name="twitter:description" content="核函数定义核函数是C语言中对device的调用的入口，其定义如下1kernel_name &amp;lt;&amp;lt;&amp;lt;grid, block&amp;gt;&amp;gt;&amp;gt;(argument list) grid参数指定了本函数有多少个块。而block参数则定义了每个块中有多少个线程，也就是说这个函数会被执行grid * block次 编写核函数在编写一个核函数的时候，在原本的函数声明前面需要加上一个限定符，">
+<meta name="twitter:image" content="http://t1.aixinxi.net/o_1c2e4c4od19h015n3164o1dgm3roa.png-w.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="机器学习从入门到放弃" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">机器学习从入门到放弃</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">从CUDA到cuDNN到进入疯人院</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-0x05" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/28/0x05/" class="article-date">
+  <time datetime="2017-12-27T16:00:00.000Z" itemprop="datePublished">2017-12-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      0x05 详解核函数
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="核函数定义"><a href="#核函数定义" class="headerlink" title="核函数定义"></a>核函数定义</h2><p>核函数是C语言中对device的调用的入口，其定义如下<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kernel_name &lt;&lt;&lt;grid, block&gt;&gt;&gt;(argument <span class="built_in">list</span>)</span><br></pre></td></tr></table></figure></p>
+<p>grid参数指定了本函数有多少个块。而block参数则定义了每个块中有多少个线程，也就是说这个函数会被执行grid * block次</p>
+<h2 id="编写核函数"><a href="#编写核函数" class="headerlink" title="编写核函数"></a>编写核函数</h2><p>在编写一个核函数的时候，在原本的函数声明前面需要加上一个限定符，其定义如下：</p>
+<table><br>    <tbody><br>        <tr><br>            <th>限定符</th><br>            <th>执行端</th><br>            <th>调用端</th><br>        </tr><br>        <tr><br>            <td><br>                <strong>global</strong><br>            </td><br>            <td>由device执行</td><br>            <td>由host调用或者是计算能力为3的device调用</td><br>        </tr><br>        <tr><br>            <td><br>                <strong>device</strong><br>            </td><br>            <td>由device执行</td><br>            <td>仅由device调用</td><br>        </tr><br>        <tr><br>            <td><br>                <strong>host</strong><br>            </td><br>            <td>由host执行</td><br>            <td>仅有host调用</td><br>        </tr><br>    </tbody><br></table>
+
+<p>有两点需要注意</p>
+<ul>
+<li>host限定符可以省略</li>
+<li><strong>device</strong>和<strong>host</strong>可以一起使用，这样的函数就可以同时在host和device上编译<h2 id="CUDA核函数的限制"><a href="#CUDA核函数的限制" class="headerlink" title="CUDA核函数的限制"></a>CUDA核函数的限制</h2></li>
+<li>只能访问设备内存</li>
+<li>返回类型必须为void</li>
+<li>不支持可变参数</li>
+<li>不支持静态变量</li>
+<li>异步调用</li>
+</ul>
+<p>其中最后一项最为重要，核函数调用之后，host端会立即执行下一条语句，因此需要<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">cudaError_t <span class="title">cudaDeviceSynchronize</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br></pre></td></tr></table></figure></p>
+<p>函数来等待GPU执行命令完毕。</p>
+<h2 id="验证核函数"><a href="#验证核函数" class="headerlink" title="验证核函数"></a>验证核函数</h2><p>这就比较简单了，有好几种验证方式</p>
+<ul>
+<li>编写一个逻辑相同的普通函数，然后比较两个的运算结果，可以使用kernel&lt;&lt;&lt;1,1&gt;&gt;&gt;来使得核函数仅仅执行一次。</li>
+<li>核函数之中可以调用printf()，因此可以利用printf()来观察变量<h2 id="衡量核函数的性能"><a href="#衡量核函数的性能" class="headerlink" title="衡量核函数的性能"></a>衡量核函数的性能</h2></li>
+<li><p>利用C语言</p>
+<p>就像之前对我们的矩阵相乘函数那样，利用clock()函数，或者是gettimeofday()函数获取较为精确的时间</p>
+</li>
+<li><p>nvprof工具</p>
+<p>从CUDA5.0版本开始，CUDA就自带了一个性能分析工具nvprof，调用方法如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nvprof [nvprof_args] &lt;application&gt; [application_args]</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>利用下面的命令获取帮助信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nvprof --help</span><br></pre></td></tr></table></figure></p>
+<p>最简单的使用方法，就是不输入任何参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nvprof ./test.exe</span><br></pre></td></tr></table></figure></p>
+<p>以下是我运行nvprof得到的结果</p>
+<p><img src="http://t1.aixinxi.net/o_1c2e4c4od19h015n3164o1dgm3roa.png-w.jpg"></p>
+<p>输出的前半部分是来自程序本身，profiling result那一行以及之后的就是分析结果了。</p>
+<p>可以看到主要由两方面组成，GPU占用和API调用。可以看到本例中GPU绝大多数被计算的核函数占用了，但是部分不太适合并行计算的项目中，比如两个大型的一维数组相加：</p>
+<p><img src="http://t1.aixinxi.net/o_1c2e5a9m5pnb1h87kejhjk4c6a.png-w.jpg"></p>
+<p>就会发现相当多的时间花在拷贝内存上面了，真正执行任务的时间只有一半左右。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/28/0x05/" data-id="cjf14qotl0004xstm4cqv60x0" class="article-share-link">Teilen</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/12/28/0x03/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          0x03 上升维度，矩阵相乘
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/26/0x01/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">0x01 出师不利</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/03/18/0x11/">0x11 OPENCL编程指南前言</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/09/0x10/">数学笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/01/0x09/">0x09 CUDA内存管理</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/30/0x07/">0x07 延迟隐藏和GPU占用率</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/30/0x08/">0x08 CUDA内存模型</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 smtdbd<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

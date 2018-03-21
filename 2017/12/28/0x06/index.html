@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>0x06 浅谈GPU架构 | 机器学习从入门到放弃</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="与CUDA的线程的三个层级类似，硬件上也是三个层级，分别是：  CUDA核心 SM流式多处理器 设备  在feimi架构中，一个SM的关键组件：  CUDA核心 共享内存/一级缓存 寄存器文件 加载/储存单元 特殊功能单元(SFU) 线程束调度器  SM的特性有：  每个SM支持数百个线程并发地执行 每个GPU有多个SM 调用核函数时，网格内的线程块会被调度在可用的SM上并发执行 一个线程块被指定">
+<meta property="og:type" content="article">
+<meta property="og:title" content="0x06 浅谈GPU架构">
+<meta property="og:url" content="http://yoursite.com/2017/12/28/0x06/index.html">
+<meta property="og:site_name" content="机器学习从入门到放弃">
+<meta property="og:description" content="与CUDA的线程的三个层级类似，硬件上也是三个层级，分别是：  CUDA核心 SM流式多处理器 设备  在feimi架构中，一个SM的关键组件：  CUDA核心 共享内存/一级缓存 寄存器文件 加载/储存单元 特殊功能单元(SFU) 线程束调度器  SM的特性有：  每个SM支持数百个线程并发地执行 每个GPU有多个SM 调用核函数时，网格内的线程块会被调度在可用的SM上并发执行 一个线程块被指定">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://t1.aixinxi.net/o_1c2fqc7va2rh1f8b1ed11p7716dma.png-w.jpg">
+<meta property="og:updated_time" content="2018-03-08T09:53:02.995Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="0x06 浅谈GPU架构">
+<meta name="twitter:description" content="与CUDA的线程的三个层级类似，硬件上也是三个层级，分别是：  CUDA核心 SM流式多处理器 设备  在feimi架构中，一个SM的关键组件：  CUDA核心 共享内存/一级缓存 寄存器文件 加载/储存单元 特殊功能单元(SFU) 线程束调度器  SM的特性有：  每个SM支持数百个线程并发地执行 每个GPU有多个SM 调用核函数时，网格内的线程块会被调度在可用的SM上并发执行 一个线程块被指定">
+<meta name="twitter:image" content="http://t1.aixinxi.net/o_1c2fqc7va2rh1f8b1ed11p7716dma.png-w.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="机器学习从入门到放弃" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">机器学习从入门到放弃</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">从CUDA到cuDNN到进入疯人院</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-0x06" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/28/0x06/" class="article-date">
+  <time datetime="2017-12-27T16:00:00.000Z" itemprop="datePublished">2017-12-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      0x06 浅谈GPU架构
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>与CUDA的线程的三个层级类似，硬件上也是三个层级，分别是：</p>
+<ul>
+<li>CUDA核心</li>
+<li>SM流式多处理器</li>
+<li>设备</li>
+</ul>
+<p>在feimi架构中，一个SM的关键组件：</p>
+<ul>
+<li>CUDA核心</li>
+<li>共享内存/一级缓存</li>
+<li>寄存器文件</li>
+<li>加载/储存单元</li>
+<li>特殊功能单元(SFU)</li>
+<li>线程束调度器</li>
+</ul>
+<p>SM的特性有：</p>
+<ul>
+<li>每个SM支持数百个线程并发地执行</li>
+<li>每个GPU有多个SM</li>
+<li>调用核函数时，网格内的线程块会被调度在可用的SM上并发执行</li>
+<li>一个线程块被指定了SM之后，其中线程只会在这个SM上执行，但是一个SM却可以容纳多个线程块。</li>
+</ul>
+<p>以上SM的特性可以解释，为何一个核函数里面，相同的block里的线程可以相互干涉和访问相同的共享内存块，不同的block里的就不行。而且CUDA采用单指令多线程(SIMT)架构管理和执行线程，每32个线程为一组，称之为线程束(warp)。</p>
+<h2 id="线程束的执行"><a href="#线程束的执行" class="headerlink" title="线程束的执行"></a>线程束的执行</h2><p>线程束是SM的基本执行单元，当一个grid被启动的时候，线程块就会被调度到各个可用的SM中，且一个线程块只会在一个SM上执行。在线程块被分配到SM中之后，线程块会被进一步的被划分为线程束，前面说到了，一个线程束是32个连续线程组成，而且线程束中的所有线程按照单指令多线程方式(SIMT)执行。也就是说，所有的线程执行相同的指令，但操作各自的数据。</p>
+<h3 id="那么现在问题就来了"><a href="#那么现在问题就来了" class="headerlink" title="那么现在问题就来了"></a>那么现在问题就来了</h3><ol>
+<li><p>如果我的一个线程块里面的线程数量不是32的整数倍的话？</p>
+<p> 那么这个线程块被划分的线程束的数量就是线程总数除以32之后，向上取整。也就是说如果有33个线程，依然要占两个线程束</p>
+</li>
+<li><p>如果我有if-else等分支语句会怎样。</p>
+<p> GPU不像CPU，有着复杂的硬件用于分支预测。GPU把几乎所有芯片面积用于计算单元了。而且一个线程束里面的所有线程执行的是相同的语句。所以当遇到if-else的时候，就会使得if条件为真的线程执行if下面的子句，然后其他线程停止等待。然后让else下面的子句执行，if条件为真的线程等待。下面借用一下CUDA C编程权威指南的代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">__<span class="function">global__ <span class="keyword">void</span> <span class="title">mathKernel1</span><span class="params">(<span class="keyword">float</span> *c)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> tid = blockIdx.x*blockDim.x + threadIdx.x;</span><br><span class="line">    <span class="keyword">float</span> a, b;</span><br><span class="line">    a = b = <span class="number">0.0f</span>;</span><br><span class="line">    <span class="keyword">if</span> (tid % <span class="number">2</span> == <span class="number">0</span>)</span><br><span class="line">        a = <span class="number">100.0f</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        b = <span class="number">200.0f</span>;</span><br><span class="line">    c[tid] = a + b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">__<span class="function">global__ <span class="keyword">void</span> <span class="title">mathKernel2</span><span class="params">(<span class="keyword">float</span> *c)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> tid = blockIdx.x*blockDim.x + threadIdx.x;</span><br><span class="line">    <span class="keyword">float</span> a, b;</span><br><span class="line">    a = b = <span class="number">0.0f</span>;</span><br><span class="line">    <span class="keyword">if</span> ((tid / warpSize) % <span class="number">2</span> == <span class="number">0</span>)</span><br><span class="line">        a = <span class="number">100.0f</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        b = <span class="number">200.0f</span>;</span><br><span class="line">    c[tid] = a + b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>第一个核函数中，就会导致先执行偶数号线程，奇数号线程等待，然后再执行奇数号线程，偶数号等待。<br>而CUDA中自带的warpSize，即线程束的大小，由于线程在线程束中是线性排列，我们可以利用这个变量使得分支的粒度增大为一个线程束，以避免分支造成的设备利用率不高。利用nvprof工具可以测试你的CUDA核函数的分支分化，只需要给nvprof提供参数”–metrics branch_efficiency”即可，其中–metrics是指进行一些特殊测试，也可以简写成-m，branch_efficiency是给定测试项目，详细内容请自行参考nvprof –help</p>
+<p><img src="http://t1.aixinxi.net/o_1c2fqc7va2rh1f8b1ed11p7716dma.png-w.jpg"></p>
+<p>如我们所愿，第一个函数的分支效率正好是50%</p>
+<h2 id="资源分配"><a href="#资源分配" class="headerlink" title="资源分配"></a>资源分配</h2><p>线程束的本地执行上下文由以下资源组成：</p>
+<ul>
+<li>程序计数器</li>
+<li>寄存器</li>
+<li>共享内存</li>
+</ul>
+<p>但是我们的SM的资源并非无限的，下表列出了不同计算能力的GPU所能提供的资源：</p>
+<table><br>    <tbody><br>        <tr align="center"><br>            <th rowspan="2">技术条件</th><br>            <th colspan="4">计算能力</th><br>        </tr><br>        <tr align="center"><br>            <th>2.0</th><br>            <th>2.1</th><br>            <th>3.0</th><br>            <th>3.5</th><br>        </tr><br>        <tr align="center"><br>            <td>每个线程块的最大线程数</td><br>            <td colspan="4">1024</td><br>        </tr><br>        <tr align="center"><br>            <td>每个SM并发线程块最大数量</td><br>            <td colspan="2">8</td><br>            <td colspan="2">16</td><br>        </tr><br>        <tr align="center"><br>            <td>每个SM并发线程束的最大数量</td><br>            <td colspan="2">48</td><br>            <td colspan="2">64</td><br>        </tr><br>        <tr align="center"><br>            <td>每个SM并发线程的最大数量</td><br>            <td colspan="2">1536</td><br>            <td colspan="2">2048</td><br>        </tr><br>        <tr align="center"><br>            <td>每个SM中32为寄存器数量</td><br>            <td colspan="2">32KB</td><br>            <td colspan="2">64KB</td><br>        </tr><br>        <tr align="center"><br>            <td>每个线程中32位寄存器最大数量</td><br>            <td colspan="2">63</td><br>            <td colspan="2">255</td><br>        </tr><br>        <tr align="center"><br>            <td>每个SM中共享内存最大数量</td><br>            <td colspan="4">48KB</td><br>        </tr><br>    </tbody><br></table>
+
+<p>可以看到每个SM最多并发2048个线程，而线程块最多16个，每个线程块最多1024个线程。意味着我们需要自行调节，是更大线程块，还是更小的线程块。更大的线程块的优势显而易见，可以让更多的线程使用相同的共享内存块，相互干涉。但是~</p>
+<p>资源回限制SM中常驻的线程块，如果这个SM没有足够的寄存器或者共享内存供一整个块使用，那么这个内核就无法启动。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/28/0x06/" data-id="cjf14qotr0006xstm0teu829e" class="article-share-link">Teilen</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/12/30/0x08/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          0x08 CUDA内存模型
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/28/0x04/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">0x04 探究CUDA运行原理</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/03/18/0x11/">0x11 OPENCL编程指南前言</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/09/0x10/">数学笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/01/0x09/">0x09 CUDA内存管理</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/30/0x07/">0x07 延迟隐藏和GPU占用率</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/30/0x08/">0x08 CUDA内存模型</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 smtdbd<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
